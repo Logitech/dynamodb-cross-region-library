@@ -1,13 +1,13 @@
 /*
  * Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License.
  * A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/asl/
- * 
+ *
  * or in the "LICENSE.txt" file accompanying this file.
- * 
+ *
  * This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
  * See the License for the specific language governing permissions and limitations under the License.
  */
@@ -19,6 +19,7 @@ import java.util.UUID;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.regions.Region;
@@ -99,6 +100,7 @@ public class CommandLineInterface {
     private final Region sourceRegion;
     private final Optional<String> sourceDynamodbEndpoint;
     private final Optional<String> sourceDynamodbStreamsEndpoint;
+    private final Optional<String> sourceRoleArn;
     private final String sourceTable;
     private final Optional<Region> kclRegion;
     private final Optional<String> kclDynamodbEndpoint;
@@ -119,6 +121,7 @@ public class CommandLineInterface {
         // set the source dynamodb endpoint
         sourceDynamodbEndpoint = Optional.fromNullable(params.getSourceEndpoint());
         sourceDynamodbStreamsEndpoint = Optional.fromNullable(params.getSourceEndpoint());
+        sourceRoleArn = Optional.fromNullable(params.getSourceRoleArn());
 
         // get source table name
         sourceTable = params.getSourceTable();
@@ -148,10 +151,16 @@ public class CommandLineInterface {
 
         // use default credential provider chain to locate appropriate credentials
         final AWSCredentialsProvider credentialsProvider = new DefaultAWSCredentialsProviderChain();
+        final AWSCredentialsProvider roleCredentials = sourceRoleArn.isPresent() ?
+                new STSAssumeRoleSessionCredentialsProvider.Builder(
+                        sourceRoleArn.get(),
+                        "test"
+                ).build() : credentialsProvider;
+
 
         // initialize DynamoDB client and set the endpoint properly for source table / region
         final AmazonDynamoDB dynamodbClient = AmazonDynamoDBClientBuilder.standard()
-                .withCredentials(credentialsProvider)
+                .withCredentials(roleCredentials)
                 .withEndpointConfiguration(createEndpointConfiguration(sourceRegion, sourceDynamodbEndpoint, AmazonDynamoDB.ENDPOINT_PREFIX))
                 .build();
 
@@ -160,13 +169,14 @@ public class CommandLineInterface {
                 sourceDynamodbStreamsEndpoint, AmazonDynamoDBStreams.ENDPOINT_PREFIX);
         final ClientConfiguration streamsClientConfig = new ClientConfiguration().withGzip(false);
         final AmazonDynamoDBStreams streamsClient = AmazonDynamoDBStreamsClientBuilder.standard()
-                .withCredentials(credentialsProvider)
+                .withCredentials(roleCredentials)
                 .withEndpointConfiguration(streamsEndpointConfiguration)
                 .withClientConfiguration(streamsClientConfig)
                 .build();
 
         // obtain the Stream ID associated with the source table
         final String streamArn = dynamodbClient.describeTable(sourceTable).getTable().getLatestStreamArn();
+        log.info("Found streamArn: "+streamArn);
         final boolean streamEnabled = DynamoDBConnectorUtilities.isStreamsEnabled(streamsClient, streamArn, DynamoDBConnectorConstants.NEW_AND_OLD);
         Preconditions.checkArgument(streamArn != null, DynamoDBConnectorConstants.MSG_NO_STREAMS_FOUND);
         Preconditions.checkState(streamEnabled, DynamoDBConnectorConstants.STREAM_NOT_READY);
@@ -210,6 +220,8 @@ public class CommandLineInterface {
         // create the KCL configuration with default values
         final KinesisClientLibConfiguration kclConfig = new KinesisClientLibConfiguration(actualTaskName,
                 streamArn,
+                roleCredentials,
+                credentialsProvider,
                 credentialsProvider,
                 DynamoDBConnectorConstants.WORKER_LABEL + actualTaskName + UUID.randomUUID().toString())
                 // worker will use checkpoint table if available, otherwise it is safer

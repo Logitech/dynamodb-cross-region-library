@@ -4,28 +4,7 @@ import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.ResponseMetadata;
 import com.amazonaws.regions.Region;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
-import com.amazonaws.services.cloudwatch.model.DeleteAlarmsRequest;
-import com.amazonaws.services.cloudwatch.model.DeleteAlarmsResult;
-import com.amazonaws.services.cloudwatch.model.DescribeAlarmHistoryRequest;
-import com.amazonaws.services.cloudwatch.model.DescribeAlarmHistoryResult;
-import com.amazonaws.services.cloudwatch.model.DescribeAlarmsForMetricRequest;
-import com.amazonaws.services.cloudwatch.model.DescribeAlarmsForMetricResult;
-import com.amazonaws.services.cloudwatch.model.DescribeAlarmsRequest;
-import com.amazonaws.services.cloudwatch.model.DescribeAlarmsResult;
-import com.amazonaws.services.cloudwatch.model.DisableAlarmActionsRequest;
-import com.amazonaws.services.cloudwatch.model.DisableAlarmActionsResult;
-import com.amazonaws.services.cloudwatch.model.EnableAlarmActionsRequest;
-import com.amazonaws.services.cloudwatch.model.EnableAlarmActionsResult;
-import com.amazonaws.services.cloudwatch.model.GetMetricStatisticsRequest;
-import com.amazonaws.services.cloudwatch.model.GetMetricStatisticsResult;
-import com.amazonaws.services.cloudwatch.model.ListMetricsRequest;
-import com.amazonaws.services.cloudwatch.model.ListMetricsResult;
-import com.amazonaws.services.cloudwatch.model.PutMetricAlarmRequest;
-import com.amazonaws.services.cloudwatch.model.PutMetricAlarmResult;
-import com.amazonaws.services.cloudwatch.model.PutMetricDataRequest;
-import com.amazonaws.services.cloudwatch.model.PutMetricDataResult;
-import com.amazonaws.services.cloudwatch.model.SetAlarmStateRequest;
-import com.amazonaws.services.cloudwatch.model.SetAlarmStateResult;
+import com.amazonaws.services.cloudwatch.model.*;
 import com.amazonaws.services.cloudwatch.waiters.AmazonCloudWatchWaiters;
 
 /**
@@ -45,6 +24,11 @@ public class NoopCloudWatch implements AmazonCloudWatch {
 
     @Override
     public DeleteAlarmsResult deleteAlarms(DeleteAlarmsRequest deleteAlarmsRequest) {
+        return null;
+    }
+
+    @Override
+    public DeleteDashboardsResult deleteDashboards(DeleteDashboardsRequest deleteDashboardsRequest) {
         return null;
     }
 
@@ -84,7 +68,17 @@ public class NoopCloudWatch implements AmazonCloudWatch {
     }
 
     @Override
+    public GetDashboardResult getDashboard(GetDashboardRequest getDashboardRequest) {
+        return null;
+    }
+
+    @Override
     public GetMetricStatisticsResult getMetricStatistics(GetMetricStatisticsRequest getMetricStatisticsRequest) {
+        return null;
+    }
+
+    @Override
+    public ListDashboardsResult listDashboards(ListDashboardsRequest listDashboardsRequest) {
         return null;
     }
 
@@ -95,6 +89,11 @@ public class NoopCloudWatch implements AmazonCloudWatch {
 
     @Override
     public ListMetricsResult listMetrics() {
+        return null;
+    }
+
+    @Override
+    public PutDashboardResult putDashboard(PutDashboardRequest putDashboardRequest) {
         return null;
     }
 

@@ -53,6 +53,12 @@ Use the `--help` option to view all available arguments to the connector executa
 
 > **NOTE**: More information on the design and internal structure of the connector library can be found in the [design doc.](./DESIGN.md) Please note it is your responsibility to ensure the connector process is up and running at all times - replication stops as soon as the process is killed, though upon resuming the process automatically uses the checkpoint table in DynamoDB to restore progress.
 
+## Cross account replication
+
+It is possible to source a stream from another AWS account. To do so, use the `--sourceRoleArn` option. The _remote_ role
+ needs to be able to _describe Dynamo table_ and access the Dynamo stream.
+ The role used to run the replication needs the `sts:AssumeRole` permission.
+
 ## Advanced: running replication process across multiple machines
 
 With extremely large tables or tables with high throughput, it might be necessary to split the replication process across multiple machines. In this case, simply kick off the target executable jar with the same command on each machine (i.e. one KCL worker per machine). The processes use the DynamoDB checkpoint table to coordinate and distribute work among them, as a result, it is *essential* that you use the same `taskName` for each process, or if you did not specify a `taskName`, a default one is computed.

@@ -1,1 +1,0 @@
-worker: java -jar target/dynamodb-cross-region-replication-1.2.1.jar --sourceRegion us-east-1 --sourceTable lip_jva_identity --destinationRegion us-east-1 --destinationTable lip_prod_identity --taskname jva_prod_identity_replication

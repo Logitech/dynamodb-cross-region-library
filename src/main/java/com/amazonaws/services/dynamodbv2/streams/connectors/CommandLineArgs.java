@@ -1,13 +1,13 @@
 /*
  * Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License.
  * A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/asl/
- * 
+ *
  * or in the "LICENSE.txt" file accompanying this file.
- * 
+ *
  * This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
  * See the License for the specific language governing permissions and limitations under the License.
  */
@@ -35,6 +35,10 @@ public class CommandLineArgs {
     public static final String SOURCE_STREAMS_ENDPOINT = "--sourceStreamsEndpoint";
     @Parameter(names = SOURCE_STREAMS_ENDPOINT, description = "DynamoDB Streams endpoint of the source table")
     private String sourceStreamsEndpoint;
+
+    public static final String SOURCE_ROLE_ARN = "--sourceRoleArn";
+    @Parameter(names = SOURCE_ROLE_ARN, description = "Role to use to retrieve source table and stream")
+    private String sourceRoleArn;
 
     public static final String SOURCE_TABLE = "--sourceTable";
     @Parameter(names = SOURCE_TABLE, description = "Name of the source table", required = true)
